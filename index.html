@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>psql2csv</title>
+  <style>
+    textarea {
+
+      width: 90%;
+      height: 30vh;
+    }
+  </style>
+</head>
+<body>
+<h1>psql table to csv convertor</h1>
+<label>Input<br/>
+  <textarea id="input"></textarea>
+</label>
+<br/>
+<label>Output<br/>
+  <textarea id="output"></textarea>
+</label>
+<script>
+  const input = document.getElementById('input');
+  const output = document.getElementById('output');
+
+  function getValues(row) {
+    return row.split(' | ').map(s => s.trim());
+  }
+
+  function convert(text) {
+    const lines = text.split("\n").map(s => s.trim()).filter(l => l);
+    const header = lines.shift();
+
+    lines.shift() // separator row
+
+    return [getValues(header), ...lines.map(getValues)]
+  }
+
+  function escape (field) {
+    if (field.includes(',')) {
+      return `"${field}"`;
+    }
+    return field;
+  }
+
+  input.addEventListener('input', () => {
+    output.textContent = convert(input.value).map(row => row.map(escape).join(",")).join("\n");
+  });
+</script>
+</body>
+</html>
